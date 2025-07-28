@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Compra Semanal - Menú Sandra Sardina</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .category {
+            margin-bottom: 30px;
+            border-radius: 10px;
+            border: 2px solid #f0f0f0;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        
+        .category:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .category-header {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            color: #333;
+            padding: 15px 20px;
+            font-weight: bold;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .category-header .icon {
+            font-size: 1.5em;
+        }
+        
+        .category-content {
+            padding: 0;
+        }
+        
+        .item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .item:last-child {
+            border-bottom: none;
+        }
+        
+        .item:hover {
+            background-color: #f8f9ff;
+        }
+        
+        .item.checked {
+            background-color: #e8f5e8;
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+        
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+        
+        .item.checked .checkbox {
+            background: #4CAF50;
+            border-color: #4CAF50;
+            color: white;
+        }
+        
+        .item-content {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .item-name {
+            font-size: 1.1em;
+            color: #333;
+        }
+        
+        .item-amount {
+            font-weight: bold;
+            color: #666;
+            background: #f0f0f0;
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 0.9em;
+        }
+        
+        .progress-bar {
+            margin: 20px 0;
+            background: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+            height: 10px;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .stats {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+        
+        .reset-btn {
+            background: linear-gradient(135deg, #ff7979, #eb4d4b);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 15px;
+            transition: transform 0.3s ease;
+        }
+        
+        .reset-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Diferentes colores para cada categoría */
+        .verduras .category-header { background: linear-gradient(135deg, #a8e6cf, #88d8a3); }
+        .frutas .category-header { background: linear-gradient(135deg, #ffd89b, #19547b); }
+        .proteinas .category-header { background: linear-gradient(135deg, #ff9a9e, #fecfef); }
+        .carbohidratos .category-header { background: linear-gradient(135deg, #a18cd1, #fbc2eb); }
+        .lacteos .category-header { background: linear-gradient(135deg, #ffecd2, #fcb69f); }
+        .condimentos .category-header { background: linear-gradient(135deg, #fbc2eb, #a6c1ee); }
+        .despensa .category-header { background: linear-gradient(135deg, #d299c2, #fef9d7); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛒 Lista de Compra Semanal</h1>
+            <p>Menú Dietético Sandra Sardina - Junio 2025</p>
+        </div>
+        
+        <div class="content">
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <div class="stats">
+                <span id="completed">0</span> de <span id="total">0</span> productos comprados
+            </div>
+            
+            <div class="category verduras">
+                <div class="category-header">
+                    <span>🥬 VERDURAS Y HORTALIZAS</span>
+                    <span class="icon">🥕</span>
+                </div>
+                <div class="category-content">
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Pimiento rojo</span>
+                            <span class="item-amount">2 unidades</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Pimiento verde</span>
+                            <span class="item-amount">2 unidades</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Cebolla</span>
+                            <span class="item-amount">3 unidades medianas</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Ajo</span>
+                            <span class="item-amount">1 cabeza</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Zanahoria</span>
+                            <span class="item-amount">500g</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Calabacín</span>
+                            <span class="item-amount">2 unidades</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Berenjena</span>
+                            <span class="item-amount">1 unidad mediana</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Brócoli o coliflor</span>
+                            <span class="item-amount">1 unidad</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Lechuga variada</span>
+                            <span class="item-amount">2 bolsas</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Espinacas frescas</span>
+                            <span class="item-amount">1 bolsa (200g)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category frutas">
+                <div class="category-header">
+                    <span>🍎 FRUTAS</span>
+                    <span class="icon">🥝</span>
+                </div>
+                <div class="category-content">
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Manzanas</span>
+                            <span class="item-amount">6 unidades</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Mango</span>
+                            <span class="item-amount">2 unidades</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Kiwi</span>
+                            <span class="item-amount">4 unidades</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Piña</span>
+                            <span class="item-amount">1 unidad (o 300g troceada)</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Fruta de temporada</span>
+                            <span class="item-amount">500g (melón, sandía, etc.)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category proteinas">
+                <div class="category-header">
+                    <span>🥩 PROTEÍNAS</span>
+                    <span class="icon">🐟</span>
+                </div>
+                <div class="category-content">
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Pechuga de pollo</span>
+                            <span class="item-amount">600g</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Cordero (pierna)</span>
+                            <span class="item-amount">200g</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Merluza fresca/congelada</span>
+                            <span class="item-amount">400g</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Calamares</span>
+                            <span class="item-amount">300g</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Mejillones</span>
+                            <span class="item-amount">500g</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Gambas</span>
+                            <span class="item-amount">200g</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Jamón serrano</span>
+                            <span class="item-amount">200g</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Huevos</span>
+                            <span class="item-amount">1 docena</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Lentejas secas</span>
+                            <span class="item-amount">250g</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category carbohidratos">
+                <div class="category-header">
+                    <span>🍞 CARBOHIDRATOS</span>
+                    <span class="icon">🍝</span>
+                </div>
+                <div class="category-content">
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Arroz</span>
+                            <span class="item-amount">200g</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Pasta integral</span>
+                            <span class="item-amount">200g</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Patatas</span>
+                            <span class="item-amount">1kg</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Pan integral</span>
+                            <span class="item-amount">1 barra</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Tortillas/Wraps</span>
+                            <span class="item-amount">1 paquete</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Cereales integrales</span>
+                            <span class="item-amount">1 paquete</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category lacteos">
+                <div class="category-header">
+                    <span>🥛 LÁCTEOS</span>
+                    <span class="icon">🧀</span>
+                </div>
+                <div class="category-content">
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Queso fresco</span>
+                            <span class="item-amount">250g</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Queso rallado</span>
+                            <span class="item-amount">100g</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Yogur natural</span>
+                            <span class="item-amount">4 unidades</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Leche</span>
+                            <span class="item-amount">1 litro</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category condimentos">
+                <div class="category-header">
+                    <span>🧂 CONDIMENTOS Y ESPECIAS</span>
+                    <span class="icon">🌿</span>
+                </div>
+                <div class="category-content">
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Aceite de oliva virgen extra</span>
+                            <span class="item-amount">500ml</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Sal</span>
+                            <span class="item-amount">1 paquete</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Pimienta negra</span>
+                            <span class="item-amount">1 bote</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Orégano</span>
+                            <span class="item-amount">1 bote</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Ajo en polvo</span>
+                            <span class="item-amount">1 bote</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Perejil fresco</span>
+                            <span class="item-amount">1 manojo</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category despensa">
+                <div class="category-header">
+                    <span>🥫 DESPENSA</span>
+                    <span class="icon">🍯</span>
+                </div>
+                <div class="category-content">
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Agua mineral</span>
+                            <span class="item-amount">2 botellas 1.5L</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Agua con gas</span>
+                            <span class="item-amount">1 botella 1.5L</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Tomate triturado</span>
+                            <span class="item-amount">2 latas</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Atún en lata</span>
+                            <span class="item-amount">2 latas</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Batido de proteína</span>
+                            <span class="item-amount">1 bote</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Frutos secos variados</span>
+                            <span class="item-amount">200g</span>
+                        </div>
+                    </div>
+                    <div class="item" onclick="toggleItem(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <span class="item-name">Puntos de espárrago</span>
+                            <span class="item-amount">200g</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="reset-btn" onclick="resetAll()">🔄 Reiniciar Lista</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleItem(element) {
+            element.classList.toggle('checked');
+            const checkbox = element.querySelector('.checkbox');
+            
+            if (element.classList.contains('checked')) {
+                checkbox.innerHTML = '✓';
+            } else {
+                checkbox.innerHTML = '';
+            }
+            
+            updateProgress();
+            saveProgress();
+        }
+        
+        function updateProgress() {
+            const allItems = document.querySelectorAll('.item');
+            const checkedItems = document.querySelectorAll('.item.checked');
+            
+            const total = allItems.length;
+            const completed = checkedItems.length;
+            const percentage = total > 0 ? (completed / total) * 100 : 0;
+            
+            document.getElementById('progress').style.width = percentage + '%';
+            document.getElementById('completed').textContent = completed;
+            document.getElementById('total').textContent = total;
+        }
+        
+        function resetAll() {
+            const items = document.querySelectorAll('.item');
+            items.forEach(item => {
+                item.classList.remove('checked');
+                item.querySelector('.checkbox').innerHTML = '';
+            });
+            updateProgress();
+            saveProgress();
+        }
+        
+        function saveProgress() {
+            const checkedItems = [];
+            document.querySelectorAll('.item.checked').forEach((item, index) => {
+                const itemName = item.querySelector('.item-name').textContent;
+                checkedItems.push(itemName);
+            });
+            localStorage.setItem('shoppingListProgress', JSON.stringify(checkedItems));
+        }
+        
+        function loadProgress() {
+            const saved = localStorage.getItem('shoppingListProgress');
+            if (saved) {
+                const checkedItems = JSON.parse(saved);
+                document.querySelectorAll('.item').forEach(item => {
+                    const itemName = item.querySelector('.item-name').textContent;
+                    if (checkedItems.includes(itemName)) {
+                        item.classList.add('checked');
+                        item.querySelector('.checkbox').innerHTML = '✓';
+                    }
+                });
+            }
+            updateProgress();
+        }
+        
+        // Cargar progreso al iniciar
+        window.addEventListener('load', loadProgress);
+    </script>
+</body>
+</html>
